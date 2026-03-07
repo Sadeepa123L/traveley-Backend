@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -28,5 +30,12 @@ public class TourPackage {
     private Double price;
     private Integer duration;
     private String imageUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "agency_id", nullable = false)
+    private AgencyProfile agencyProfile;
+
+    @OneToMany(mappedBy = "tourPackage", cascade = CascadeType.ALL)
+    private List<Booking> bookings;
 
 }
