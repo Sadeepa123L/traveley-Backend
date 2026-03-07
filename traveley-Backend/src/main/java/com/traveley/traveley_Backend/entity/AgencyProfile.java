@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,4 +30,14 @@ public class AgencyProfile {
 
     private String address;
     private String photoUrl;
+
+    @OneToMany(mappedBy = "agencyProfile", cascade = CascadeType.ALL)
+    private List<Booking> bookings;
+
+    @OneToMany(mappedBy = "agencyProfile", cascade = CascadeType.ALL)
+    private List<TourPackage> tourPackages;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }
