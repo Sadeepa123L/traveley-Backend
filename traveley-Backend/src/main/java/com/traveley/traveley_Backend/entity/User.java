@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,4 +23,10 @@ public class User {
     private String status;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private AgencyProfile agencyProfiles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private TravelerProfile travelerProfiles;
 }
