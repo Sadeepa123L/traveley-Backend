@@ -28,8 +28,31 @@ public class AuthController {
     public ResponseEntity<APIResponseDTO> registerAgency(@RequestBody RegisterDTO registerDTO) {
         return ResponseEntity.ok(new APIResponseDTO(
                 200,
-                "Success",
+                "Agency registration submitted. Please wait for admin approval.",
                 authService.registerAgency(registerDTO)
         ));
+    }
+    @PostMapping("/login/traveler")
+    public ResponseEntity<APIResponseDTO> authenticateTraveler(@RequestBody AuthDTO authDTO) {
+        return ResponseEntity.ok(new APIResponseDTO(
+                    200,
+                "success",
+                authService.authenticateTraveler(authDTO)
+        ));
+    }
+    @PostMapping("/login/agency")
+    public ResponseEntity<APIResponseDTO> authenticateAgency(@RequestBody AuthDTO authDTO) {
+        try{
+            String token = authService.authenticateAgency(authDTO);
+            APIResponseDTO response = new APIResponseDTO(
+                    200,
+                    "Agency login successful!",
+                     token
+            );
+            return ResponseEntity.ok(response);
+        }catch (RuntimeException e){
+            APIResponseDTO errResponse = new APIResponseDTO(403,e.getMessage(),null);
+            return ResponseEntity.status(403).body(errResponse);
+        }
     }
 }
