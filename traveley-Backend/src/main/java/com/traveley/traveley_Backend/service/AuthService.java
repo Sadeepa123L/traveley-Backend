@@ -22,16 +22,31 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthResponseDTO authenticate(AuthDTO authDTO){
+    public AuthResponseDTO authenticateTraveler(AuthDTO authDTO){
         User user = userRepo.findByUsername(authDTO.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException(authDTO.getUsername())
+                () -> new UsernameNotFoundException("Username not found" + authDTO.getUsername())
         );
-        if (!passwordEncoder.matches(authDTO.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException(authDTO.getUsername());
+        if(user.getPassword() == null){
+            throw new BadCredentialsException("This account is linked to Google. Please log in using Google.");
         }
 
-        String token = jwtUtil.generateToken(authDTO.getUsername());
+        if (!passwordEncoder.matches(authDTO.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
+        String token = jwtUtil.generateToken(authDTO.getUsername(), user.getRole().name());
         return new AuthResponseDTO(token);
+    }
+
+    public String authenticateAgency(AuthDTO authDTO){
+        User user = userRepo.findByUsername(authDTO.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("Username not found" + authDTO.getUsername())
+        );
+
+        if ("AGENCY".equals(user.getRole().name()) && "PENDING".equalsIgnoreCase(user.getStatus())){
+            throw new RuntimeException("Your agency account is still pending admin approval.");
+        }
+        return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
     }
 
     public String registerTraveler(RegisterDTO registerDTO){
@@ -63,5 +78,17 @@ public class AuthService {
         if (userRepo.findByUsername(username).isPresent()) {
             throw new RuntimeException("Error: Username is already taken!");
         }
+    }
+    public String handleGoogleTraveler(String username, String password){
+        User user = userRepo.findByUsername(username).orElseGet(() ->{
+            User newUser = User.builder()
+                    .username(username)
+                    .password(null)
+                    .role(Role.TRAVELER)
+                    .status("ACTIVE")
+                    .build();
+            return userRepo.save(newUser);
+        });
+        return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
     }
 }
