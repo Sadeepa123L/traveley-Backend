@@ -16,8 +16,9 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         return Jwts.builder()
+                .claim("role", role)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(
