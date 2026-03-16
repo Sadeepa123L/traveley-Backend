@@ -4,7 +4,9 @@ import com.traveley.traveley_Backend.dto.TourPackageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface TourPackageService {
     void addTourPackage(String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException;
+    List<TourPackageDTO> getPackagesForCurrentAgency(String username);
 }
