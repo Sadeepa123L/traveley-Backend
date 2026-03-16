@@ -112,4 +112,16 @@ public class TourPackageServiceImpl implements TourPackageService {
         TourPackage savedPackage = tourPackageRepo.save(existingPackage);
         return modelMapper.map(savedPackage, TourPackageDTO.class);
     }
+
+    @Override
+    public void deletePackage(Long id, String username) {
+
+        User user = userRepo.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        TourPackage tourPackage = tourPackageRepo.findById(id)
+                .orElseThrow(()-> new RuntimeException("Tour Package not found with ID:" + id));
+
+        tourPackageRepo.delete(tourPackage);
+    }
+
 }
