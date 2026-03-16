@@ -5,9 +5,7 @@ import com.traveley.traveley_Backend.dto.AgencyResponseDTO;
 import com.traveley.traveley_Backend.service.custom.AgencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +24,17 @@ public class AgencyController {
                 200,
                 "Pending agencies fetched successfully",
                 pendingAgencies
+        );
+        return  ResponseEntity.ok(response);
+    }
+    @PutMapping("/approve/{id}")
+    public ResponseEntity<APIResponseDTO> approveAgency(@PathVariable Long id){
+        String result = agencyService.approveAgency(id);
+
+        APIResponseDTO response = new APIResponseDTO(
+                200,
+                result,
+                null
         );
         return  ResponseEntity.ok(response);
     }
