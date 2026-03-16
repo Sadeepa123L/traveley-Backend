@@ -5,15 +5,13 @@ import com.traveley.traveley_Backend.service.custom.AgencyProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/agencyProfile")
@@ -35,5 +33,14 @@ public class AgencyProfileController {
             return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
+    @GetMapping("/getProfile")
+    public ResponseEntity<?> getProfile(Principal principal){
+        try{
+            AgencyProfileDTO agencyProfileDTO = agencyProfileService.getProfile(principal.getName());
+            return ResponseEntity.ok(agencyProfileDTO);
+        }catch (RuntimeException e){
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
     }
+}
 
