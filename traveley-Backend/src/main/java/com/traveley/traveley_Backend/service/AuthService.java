@@ -40,9 +40,14 @@ public class AuthService {
 
     public String authenticateAgency(AuthDTO authDTO){
         User user = userRepo.findByUsername(authDTO.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("Username not found" + authDTO.getUsername())
+                () -> new UsernameNotFoundException("Username not found: " + authDTO.getUsername())
         );
-
+        if(user.getPassword() == null || "OAUTH2_USER".equals(user.getPassword())){
+            throw new BadCredentialsException("This account is linked to Google. Please log in using Google.");
+        }
+        if (!passwordEncoder.matches(authDTO.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
         if ("AGENCY".equals(user.getRole().name()) && "PENDING".equalsIgnoreCase(user.getStatus())){
             throw new RuntimeException("Your agency account is still pending admin approval.");
         }
