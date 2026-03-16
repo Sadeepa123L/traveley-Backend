@@ -9,6 +9,5 @@ import java.util.List;
 public interface TourPackageService {
     void addTourPackage(String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException;
     List<TourPackageDTO> getPackagesForCurrentAgency(String username);
-    void updateTourPackage(Long id, String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException;
-
+    TourPackageDTO updateTourPackage(Long id, String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException;
 }

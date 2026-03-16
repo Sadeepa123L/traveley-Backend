@@ -81,6 +81,35 @@ public class TourPackageServiceImpl implements TourPackageService {
     }
 
     @Override
-    public void updateTourPackage(Long id, String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException {
+    public TourPackageDTO updateTourPackage(Long id, String username, TourPackageDTO tourPackageDTO, MultipartFile image) throws IOException {
+
+        //user find
+        User user = userRepo.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        //Agency profile find
+        AgencyProfile agencyProfile = agencyProfileRepo.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("Agency Profile not found. Please complete your profile first."));
+
+        //Tour package find
+        TourPackage existingPackage = tourPackageRepo.findById(id)
+                .orElseThrow(()-> new RuntimeException("Tour Package not found with ID:" + id));
+
+        //new details
+        existingPackage.setTitle(tourPackageDTO.getTitle());
+        existingPackage.setDescription(tourPackageDTO.getDescription());
+        existingPackage.setDestination(tourPackageDTO.getDestination());
+        existingPackage.setPrice(tourPackageDTO.getPrice());
+        existingPackage.setDuration(tourPackageDTO.getDuration());
+
+        //new image update
+        if (image != null && !image.isEmpty()) {
+            Map uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
+            String imageUrl = uploadResult.get("secure_url").toString();
+            existingPackage.setImageUrl(imageUrl);
+        }
+
+        //update krapu package eka save karala DTO ekak widiyata return karanwa
+        TourPackage savedPackage = tourPackageRepo.save(existingPackage);
+        return modelMapper.map(savedPackage, TourPackageDTO.class);
     }
 }
