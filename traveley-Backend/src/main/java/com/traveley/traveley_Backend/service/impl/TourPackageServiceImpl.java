@@ -11,11 +11,13 @@ import com.traveley.traveley_Backend.repository.TourPackageRepo;
 import com.traveley.traveley_Backend.repository.UserRepo;
 import com.traveley.traveley_Backend.service.custom.TourPackageService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,6 +28,7 @@ public class TourPackageServiceImpl implements TourPackageService {
     private final AgencyProfileRepo agencyProfileRepo;
     private final TourPackageRepo tourPackageRepo;
     private final Cloudinary cloudinary;
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -52,5 +55,20 @@ public class TourPackageServiceImpl implements TourPackageService {
             tourPackage.setImageUrl(photoUrl);
         }
         tourPackageRepo.save(tourPackage);
+    }
+
+    @Override
+    public List<TourPackageDTO> getPackagesForCurrentAgency(String username) {
+
+        User user = userRepo.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
+
+        AgencyProfile agencyProfile = agencyProfileRepo.findByUserId(user.getId())
+                .orElseThrow(()-> new RuntimeException("Agency Profile not found."));
+
+        List<TourPackage> packages = tourPackageRepo.findByAgencyProfile_Id(agencyProfile.getId());
+
+        return packages.stream()
+                .map(pkg -> modelMapper.map(pkg, TourPackageDTO.class))
+                .toList();
     }
 }
