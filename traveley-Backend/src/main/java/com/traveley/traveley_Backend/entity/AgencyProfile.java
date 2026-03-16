@@ -29,6 +29,8 @@ public class AgencyProfile {
     private String contactNumber;
 
     private String address;
+    @Column(columnDefinition = "TEXT")
+    private String description;
     private String photoUrl;
 
     @OneToMany(mappedBy = "agencyProfile", cascade = CascadeType.ALL)
