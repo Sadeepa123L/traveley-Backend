@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -62,13 +64,23 @@ public class TourPackageServiceImpl implements TourPackageService {
 
         User user = userRepo.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
 
-        AgencyProfile agencyProfile = agencyProfileRepo.findByUserId(user.getId())
-                .orElseThrow(()-> new RuntimeException("Agency Profile not found."));
+        Optional<AgencyProfile> agencyProfileOpt = agencyProfileRepo.findByUserId(user.getId());
+        if (agencyProfileOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
 
-        List<TourPackage> packages = tourPackageRepo.findByAgencyProfile_Id(agencyProfile.getId());
+        List<TourPackage> packages = tourPackageRepo.findByAgencyProfile_Id(agencyProfileOpt.get().getId());
+
+        if (packages == null || packages.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         return packages.stream()
                 .map(pkg -> modelMapper.map(pkg, TourPackageDTO.class))
                 .toList();
+    }
+
+    @Override
+    public void updateTourPackage(Long id, String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException {
     }
 }
