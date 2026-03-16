@@ -14,5 +14,6 @@ public class AgencyProfileDTO {
     private String registrationNumber;
     private String contactNumber;
     private String address;
+    private String description;
     private String photoUrl;
 }
