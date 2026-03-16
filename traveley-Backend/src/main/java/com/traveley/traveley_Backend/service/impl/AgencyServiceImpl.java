@@ -38,4 +38,12 @@ public class AgencyServiceImpl implements AgencyService {
             );
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public String approveAgency(Long agencyId) {
+        User agency = agencyRepo.findById(agencyId).orElseThrow(() -> new RuntimeException("Agency not found"));
+        agency.setStatus("ACTIVE");
+        agencyRepo.save(agency);
+        return "Agency approved successfully!";
+    }
 }
