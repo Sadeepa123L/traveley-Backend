@@ -4,14 +4,12 @@ import com.traveley.traveley_Backend.dto.TourPackageDTO;
 import com.traveley.traveley_Backend.service.custom.TourPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,6 +34,16 @@ public class TourPackageController {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }catch (Exception e){
             return ResponseEntity.status(500).body(Map.of("error", "Internal Server Error occurred."));
+        }
+    }
+
+    @GetMapping("/myPackages")
+    public ResponseEntity<List<TourPackageDTO>> getMyPackages(Principal principal){
+        try{
+            List<TourPackageDTO> packages = tourPackageService.getPackagesForCurrentAgency(principal.getName());
+            return ResponseEntity.ok(packages);
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(null);
         }
     }
 }
