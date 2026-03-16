@@ -48,7 +48,8 @@ public class TourPackageServiceImpl implements TourPackageService {
         if (photo != null && !photo.isEmpty()) {
             Map uploadResult = cloudinary.uploader().upload(photo.getBytes(), ObjectUtils.emptyMap());
             String photoUrl = uploadResult.get("secure_url").toString();
-            agencyProfile.setPhotoUrl(photoUrl);
+
+            tourPackage.setImageUrl(photoUrl);
         }
         tourPackageRepo.save(tourPackage);
     }
