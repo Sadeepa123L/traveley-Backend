@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class AgencyResponseDTO {
     private Long id;
     private String name;
-    private String date;
     private String status;
+    private String date;
+
 }
