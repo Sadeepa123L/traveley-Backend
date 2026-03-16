@@ -83,9 +83,21 @@ public class AuthService {
         User user = userRepo.findByUsername(username).orElseGet(() ->{
             User newUser = User.builder()
                     .username(username)
-                    .password(null)
+                    .password("OAUTH2_USER")
                     .role(Role.TRAVELER)
                     .status("ACTIVE")
+                    .build();
+            return userRepo.save(newUser);
+        });
+        return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
+    }
+    public String handleGoogleAgency(String username, String password){
+        User user = userRepo.findByUsername(username).orElseGet(() -> {
+            User newUser = User.builder()
+                    .username(username)
+                    .password("OAUTH2_USER")
+                    .role(Role.AGENCY)
+                    .status("PENDING")
                     .build();
             return userRepo.save(newUser);
         });
