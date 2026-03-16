@@ -7,4 +7,5 @@ import java.io.IOException;
 
 public interface AgencyProfileService {
     void saveOrUpdateProfile(String username, AgencyProfileDTO agencyProfileDTO, MultipartFile profileImage) throws IOException;
+    AgencyProfileDTO getProfile(String username);
 }

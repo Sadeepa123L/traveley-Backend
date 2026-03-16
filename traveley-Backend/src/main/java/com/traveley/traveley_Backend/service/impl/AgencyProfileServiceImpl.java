@@ -9,6 +9,7 @@ import com.traveley.traveley_Backend.repository.AgencyProfileRepo;
 import com.traveley.traveley_Backend.repository.UserRepo;
 import com.traveley.traveley_Backend.service.custom.AgencyProfileService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,7 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
     private final AgencyProfileRepo agencyProfileRepo;
     private final UserRepo userRepo;
     private final Cloudinary cloudinary;
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -50,5 +52,17 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
         }
 
         agencyProfileRepo.save(agencyProfile);
+    }
+
+    @Override
+    public AgencyProfileDTO getProfile(String username) {
+
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        AgencyProfile agencyProfile = agencyProfileRepo.findByUserId(user.getId())
+                .orElseThrow(()-> new RuntimeException("Agency profile not found"));
+
+        return modelMapper.map(agencyProfile, AgencyProfileDTO.class);
     }
 }
