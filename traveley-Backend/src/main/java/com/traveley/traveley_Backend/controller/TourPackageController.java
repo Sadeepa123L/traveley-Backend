@@ -68,4 +68,16 @@ public class TourPackageController {
             return ResponseEntity.status(500).body(Map.of("error", "Internal Server Error occurred."));
         }
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteTourPackage(@PathVariable Long id, Principal principal){
+        try{
+            tourPackageService.deletePackage(id, principal.getName());
+            return ResponseEntity.ok(Map.of("message", "Tour Package deleted successfully! 🗑️"));
+        }catch (RuntimeException e){
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(Map.of("error", "Internal Server Error"));
+        }
+    }
 }
