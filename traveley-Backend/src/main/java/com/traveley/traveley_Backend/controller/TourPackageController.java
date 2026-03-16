@@ -21,14 +21,14 @@ public class TourPackageController {
 
     private final TourPackageService tourPackageService;
 
-    @PostMapping(value = "/save", consumes = {"multipart/formData"})
+    @PostMapping(value = "/save", consumes = {"multipart/form-data"})
     public ResponseEntity<?> saveTourPackage(
             Principal principal,
             @RequestPart("packageData")TourPackageDTO tourPackageDTO,
-            @RequestPart(value = "photo", required = false) MultipartFile photo
+            @RequestPart(value = "image", required = false) MultipartFile image
             ){
         try{
-            tourPackageService.addTourPackage(principal.getName(), tourPackageDTO, photo);
+            tourPackageService.addTourPackage(principal.getName(), tourPackageDTO, image);
             return ResponseEntity.ok(Map.of("message", "Tour Package saved successfully!"));
         }catch (IOException e){
             return ResponseEntity.status(500).body(Map.of("error", "Image upload failed: " + e.getMessage()));

@@ -13,6 +13,6 @@ public class TourPackageDTO {
     private String description;
     private String destination;
     private Double price;
-    private Integer duration;
+    private String duration;
     private String imageUrl;
 }

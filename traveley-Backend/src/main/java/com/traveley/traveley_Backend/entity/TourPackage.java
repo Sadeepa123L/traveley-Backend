@@ -28,7 +28,7 @@ public class TourPackage {
 
     private String destination;
     private Double price;
-    private Integer duration;
+    private String duration;
     private String imageUrl;
 
     @ManyToOne
