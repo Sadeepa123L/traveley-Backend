@@ -43,6 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public APIResponseDTO handleRuntimeException(RuntimeException ex) {
+        ex.printStackTrace();
         return new APIResponseDTO(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "error occurred",
