@@ -80,4 +80,13 @@ public class TourPackageController {
             return ResponseEntity.status(500).body(Map.of("error", "Internal Server Error"));
         }
     }
+    @GetMapping("/activePackages")
+    public ResponseEntity<?> getActivePackages(){
+        try {
+            List<TourPackageDTO> packages = tourPackageService.getAllPackages();
+            return ResponseEntity.ok(packages);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
 }
