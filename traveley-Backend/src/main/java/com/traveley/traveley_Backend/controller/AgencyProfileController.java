@@ -1,6 +1,7 @@
 package com.traveley.traveley_Backend.controller;
 
 import com.traveley.traveley_Backend.dto.AgencyProfileDTO;
+import com.traveley.traveley_Backend.dto.AgencyResponseDTO;
 import com.traveley.traveley_Backend.service.custom.AgencyProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.*;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,6 +42,15 @@ public class AgencyProfileController {
             return ResponseEntity.ok(agencyProfileDTO);
         }catch (RuntimeException e){
             return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
+    }
+    @GetMapping("/activeAgencies")
+    public ResponseEntity<?> getActiveAgencies(){
+        try{
+            List<AgencyProfileDTO> agencies = agencyProfileService.getAllActiveAgencies();
+            return ResponseEntity.ok(agencies);
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 }
