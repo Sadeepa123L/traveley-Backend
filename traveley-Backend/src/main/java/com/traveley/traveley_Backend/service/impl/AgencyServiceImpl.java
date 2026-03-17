@@ -5,8 +5,10 @@ import com.traveley.traveley_Backend.dto.AgencyResponseDTO;
 import com.traveley.traveley_Backend.entity.Role;
 import com.traveley.traveley_Backend.entity.User;
 import com.traveley.traveley_Backend.repository.AgencyRepo;
+import com.traveley.traveley_Backend.repository.UserRepo;
 import com.traveley.traveley_Backend.service.custom.AgencyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 public class AgencyServiceImpl implements AgencyService {
 
     private final AgencyRepo agencyRepo;
+    private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<AgencyResponseDTO> getPendingAgencies() {
@@ -45,5 +49,19 @@ public class AgencyServiceImpl implements AgencyService {
         agency.setStatus("ACTIVE");
         agencyRepo.save(agency);
         return "Agency approved successfully!";
+    }
+
+    @Override
+    public void updatePassword(String username, String currentPassword, String newPassword) {
+
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
     }
 }

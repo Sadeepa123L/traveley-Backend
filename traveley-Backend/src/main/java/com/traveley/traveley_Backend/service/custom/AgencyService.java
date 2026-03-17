@@ -7,4 +7,5 @@ import java.util.List;
 public interface AgencyService {
     List<AgencyResponseDTO> getPendingAgencies();
     String approveAgency(Long Id);
+    void updatePassword(String username, String currentPassword, String newPassword);
 }
