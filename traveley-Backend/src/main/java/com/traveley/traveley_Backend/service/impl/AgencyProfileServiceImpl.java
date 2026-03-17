@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.traveley.traveley_Backend.dto.AgencyProfileDTO;
 import com.traveley.traveley_Backend.entity.AgencyProfile;
+import com.traveley.traveley_Backend.entity.Role;
 import com.traveley.traveley_Backend.entity.User;
 import com.traveley.traveley_Backend.repository.AgencyProfileRepo;
 import com.traveley.traveley_Backend.repository.UserRepo;
@@ -15,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -64,5 +67,14 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
                 .orElseThrow(()-> new RuntimeException("Agency profile not found"));
 
         return modelMapper.map(agencyProfile, AgencyProfileDTO.class);
+    }
+
+    @Override
+    public List<AgencyProfileDTO> getAllActiveAgencies() {
+        List<AgencyProfile> activeAgencies = agencyProfileRepo.findByUser_StatusAndUser_Role("ACTIVE", Role.AGENCY);
+
+        return activeAgencies.stream()
+                .map(profile -> modelMapper.map(profile, AgencyProfileDTO.class))
+                .collect(Collectors.toList());
     }
 }
