@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -124,4 +125,12 @@ public class TourPackageServiceImpl implements TourPackageService {
         tourPackageRepo.delete(tourPackage);
     }
 
+    @Override
+    public List<TourPackageDTO> getAllPackages() {
+        List<TourPackage> activePackages =tourPackageRepo.findActivePackages("ACTIVE");
+
+        return activePackages.stream()
+                .map(tourPackage -> modelMapper.map(tourPackage, TourPackageDTO.class))
+                .collect(Collectors.toList());
+    }
 }
