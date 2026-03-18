@@ -12,4 +12,5 @@ public interface TourPackageService {
     TourPackageDTO updateTourPackage(Long id, String username, TourPackageDTO tourPackageDTO, MultipartFile photo) throws IOException;
     void deletePackage(Long id, String username);
     List<TourPackageDTO> getAllPackages();
+    List<TourPackageDTO> getLatestPackages();
 }

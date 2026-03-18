@@ -12,9 +12,12 @@ import com.traveley.traveley_Backend.repository.UserRepo;
 import com.traveley.traveley_Backend.service.custom.TourPackageService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -128,6 +131,19 @@ public class TourPackageServiceImpl implements TourPackageService {
     @Override
     public List<TourPackageDTO> getAllPackages() {
         List<TourPackage> activePackages =tourPackageRepo.findActivePackages("ACTIVE");
+
+        return activePackages.stream()
+                .map(tourPackage -> modelMapper.map(tourPackage, TourPackageDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    
+    public List<TourPackageDTO> getLatestPackages() {
+
+        Pageable limit = PageRequest.of(0, 8);
+
+        List<TourPackage> activePackages = tourPackageRepo.findLatestPackages("ACTIVE", limit);
 
         return activePackages.stream()
                 .map(tourPackage -> modelMapper.map(tourPackage, TourPackageDTO.class))
