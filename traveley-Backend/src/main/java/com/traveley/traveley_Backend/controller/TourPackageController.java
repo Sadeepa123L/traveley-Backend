@@ -89,4 +89,15 @@ public class TourPackageController {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/latestPackages")
+    public ResponseEntity<?> getLatestPackages(){
+        try{
+            List<TourPackageDTO> packages = tourPackageService.getLatestPackages();
+            return ResponseEntity.ok(packages);
+        }catch (Exception e){
+            e.printStackTrace();
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown Server Error Occurred";
+            return ResponseEntity.status(500).body(Map.of("error", errorMsg));        }
+    }
 }
