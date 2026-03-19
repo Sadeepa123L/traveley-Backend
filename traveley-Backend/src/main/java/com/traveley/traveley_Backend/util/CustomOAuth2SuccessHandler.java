@@ -30,7 +30,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         String token = authService.handleGoogleTraveler(email, name);
 
-        String targetUrl = "http://localhost:5173/?token=" + token;
+        String targetUrl = "http://localhost:5173/oauth2/redirect?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
