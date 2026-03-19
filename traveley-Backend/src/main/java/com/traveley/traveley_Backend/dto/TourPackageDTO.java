@@ -15,4 +15,6 @@ public class TourPackageDTO {
     private Double price;
     private String duration;
     private String imageUrl;
+
+    private AgencyProfileDTO agencyProfile;
 }
