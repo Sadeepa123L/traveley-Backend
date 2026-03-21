@@ -11,6 +11,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -51,4 +54,30 @@ public class TravelerProfileImpl implements TravelerProfileService {
 
         return modelMapper.map(travelerProfile, TravelerProfileDTO.class);
     }
+
+    @Override
+    @Transactional
+    public void deleteTraveler(Long id) {
+
+        TravelerProfile travelerProfile = travelerProfileRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        User user = travelerProfile.getUser();
+
+        travelerProfileRepo.delete(travelerProfile);
+
+        if (user != null) {
+            userRepo.delete(user);
+        }
+    }
+
+    @Override
+    public List<TravelerProfileDTO> getAllProfiles() {
+        List<TravelerProfile> profiles = travelerProfileRepo.findAll();
+
+        return profiles.stream().map(profile -> modelMapper
+                .map(profile, TravelerProfileDTO.class))
+                .collect(Collectors.toList());
+    }
+
 }
