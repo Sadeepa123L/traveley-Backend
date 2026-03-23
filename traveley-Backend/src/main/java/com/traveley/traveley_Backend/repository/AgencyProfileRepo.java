@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface AgencyProfileRepo extends JpaRepository<AgencyProfile, Long> {
     Optional<AgencyProfile> findByUserId(Long id);
     List<AgencyProfile> findByUser_StatusAndUser_Role(String user_status, Role user_role);
+    List<AgencyProfile> findByUser_StatusInAndUser_Role(List<String> statuses, Role user_role);
 }
