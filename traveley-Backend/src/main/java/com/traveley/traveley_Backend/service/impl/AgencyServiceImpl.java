@@ -2,8 +2,10 @@ package com.traveley.traveley_Backend.service.impl;
 
 import com.traveley.traveley_Backend.dto.APIResponseDTO;
 import com.traveley.traveley_Backend.dto.AgencyResponseDTO;
+import com.traveley.traveley_Backend.entity.AgencyProfile;
 import com.traveley.traveley_Backend.entity.Role;
 import com.traveley.traveley_Backend.entity.User;
+import com.traveley.traveley_Backend.repository.AgencyProfileRepo;
 import com.traveley.traveley_Backend.repository.AgencyRepo;
 import com.traveley.traveley_Backend.repository.UserRepo;
 import com.traveley.traveley_Backend.service.custom.AgencyService;
@@ -23,6 +25,7 @@ public class AgencyServiceImpl implements AgencyService {
     private final AgencyRepo agencyRepo;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final AgencyProfileRepo agencyProfileRepo;
 
     @Override
     public List<AgencyResponseDTO> getPendingAgencies() {
@@ -63,5 +66,22 @@ public class AgencyServiceImpl implements AgencyService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepo.save(user);
+    }
+
+    @Override
+    public void updateStatus(Long id) {
+        AgencyProfile profile = agencyProfileRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agency not found"));
+
+        User user = profile.getUser();
+
+        if(user != null){
+            if("ACTIVE" .equalsIgnoreCase(user.getStatus())){
+                user.setStatus("SUSPENDED");
+            } else if ("SUSPENDED" .equalsIgnoreCase(user.getStatus())) {
+                user.setStatus("ACTIVE");
+            }
+            userRepo.save(user);
+        }
     }
 }

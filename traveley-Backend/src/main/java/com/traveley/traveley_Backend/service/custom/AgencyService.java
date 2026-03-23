@@ -8,4 +8,5 @@ public interface AgencyService {
     List<AgencyResponseDTO> getPendingAgencies();
     String approveAgency(Long Id);
     void updatePassword(String username, String currentPassword, String newPassword);
+    void updateStatus(Long id);
 }

@@ -2,7 +2,6 @@ package com.traveley.traveley_Backend.repository;
 
 import com.traveley.traveley_Backend.entity.Role;
 import com.traveley.traveley_Backend.entity.User;
-import org.hibernate.engine.spi.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
