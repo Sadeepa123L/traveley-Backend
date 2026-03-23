@@ -50,4 +50,14 @@ public class AgencyController {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }
     }
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id){
+        try {
+            agencyService.updateStatus(id);
+            return ResponseEntity.ok(Map.of("message", "Status updated successfully"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
