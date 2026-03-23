@@ -56,7 +56,6 @@ public class AgencyController {
             agencyService.updateStatus(id);
             return ResponseEntity.ok(Map.of("message", "Status updated successfully"));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
