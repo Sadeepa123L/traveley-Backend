@@ -9,4 +9,5 @@ public interface AgencyService {
     String approveAgency(Long Id);
     void updatePassword(String username, String currentPassword, String newPassword);
     void updateStatus(Long id);
+    void deleteAgency(Long id);
 }

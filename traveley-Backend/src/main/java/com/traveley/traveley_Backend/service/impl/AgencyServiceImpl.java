@@ -84,4 +84,19 @@ public class AgencyServiceImpl implements AgencyService {
             userRepo.save(user);
         }
     }
+
+    @Override
+    public void deleteAgency(Long id) {
+
+        AgencyProfile agencyProfile = agencyProfileRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agency not found"));
+
+        User user = agencyProfile.getUser();
+
+        agencyProfileRepo.delete(agencyProfile);
+
+        if(user != null){
+            userRepo.delete(user);
+        }
+    }
 }
