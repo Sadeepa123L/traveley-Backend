@@ -3,6 +3,7 @@ package com.traveley.traveley_Backend.service.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.traveley.traveley_Backend.dto.AgencyProfileDTO;
+import com.traveley.traveley_Backend.dto.AgencyProfileResponseDTO;
 import com.traveley.traveley_Backend.entity.AgencyProfile;
 import com.traveley.traveley_Backend.entity.Role;
 import com.traveley.traveley_Backend.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +36,7 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
     @Override
     public void saveOrUpdateProfile(String username, AgencyProfileDTO agencyProfileDTO, MultipartFile profileImage) throws IOException {
         User user = userRepo.findByUsername(username)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Long userId = user.getId();
 
@@ -61,10 +63,10 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
     public AgencyProfileDTO getProfile(String username) {
 
         User user = userRepo.findByUsername(username)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         AgencyProfile agencyProfile = agencyProfileRepo.findByUserId(user.getId())
-                .orElseThrow(()-> new RuntimeException("Agency profile not found"));
+                .orElseThrow(() -> new RuntimeException("Agency profile not found"));
 
         return modelMapper.map(agencyProfile, AgencyProfileDTO.class);
     }
@@ -75,6 +77,26 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
 
         return activeAgencies.stream()
                 .map(profile -> modelMapper.map(profile, AgencyProfileDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AgencyProfileResponseDTO> getAllActiveAndSuspendAgencies() {
+
+        List<String> statuses = Arrays.asList("ACTIVE", "SUSPENDED");
+        List<AgencyProfile> agencies = agencyProfileRepo.findByUser_StatusInAndUser_Role(statuses, Role.AGENCY);
+
+        return agencies.stream()
+                .map(agency -> {
+                    AgencyProfileResponseDTO agencyProfileResponseDTO = modelMapper.map(agency, AgencyProfileResponseDTO.class);
+
+                    agency.getUser().setStatus(agency.getUser().getStatus());
+
+                    if (agency.getUser() != null) {
+                        agencyProfileResponseDTO.setStatus(agency.getUser().getStatus());
+                    }
+                    return agencyProfileResponseDTO;
+                })
                 .collect(Collectors.toList());
     }
 }
