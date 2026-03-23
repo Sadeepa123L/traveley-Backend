@@ -1,6 +1,7 @@
 package com.traveley.traveley_Backend.controller;
 
 import com.traveley.traveley_Backend.dto.AgencyProfileDTO;
+import com.traveley.traveley_Backend.dto.AgencyProfileResponseDTO;
 import com.traveley.traveley_Backend.dto.AgencyResponseDTO;
 import com.traveley.traveley_Backend.service.custom.AgencyProfileService;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,17 @@ public class AgencyProfileController {
         }catch (Exception e){
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
+    }
+    @GetMapping("/active-suspend")
+    public ResponseEntity<List<AgencyProfileResponseDTO>> getActiveAndSuspendedAgencies() {
+        try {
+            List<AgencyProfileResponseDTO> agencies  = agencyProfileService.getAllActiveAndSuspendAgencies();
+            return ResponseEntity.ok(agencies);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 }
 
