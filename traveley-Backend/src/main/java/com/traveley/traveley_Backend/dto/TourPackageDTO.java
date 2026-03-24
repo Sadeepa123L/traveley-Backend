@@ -17,4 +17,5 @@ public class TourPackageDTO {
     private String imageUrl;
 
     private AgencyProfileDTO agencyProfile;
+
 }
