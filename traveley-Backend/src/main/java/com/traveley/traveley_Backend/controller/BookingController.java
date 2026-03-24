@@ -1,16 +1,15 @@
 package com.traveley.traveley_Backend.controller;
 
 import com.traveley.traveley_Backend.dto.BookingDTO;
+import com.traveley.traveley_Backend.dto.BookingResponseDTO;
 import com.traveley.traveley_Backend.service.custom.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -37,6 +36,25 @@ public class BookingController {
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "An unexpected error occurred while processing your booking."));
+        }
+    }
+
+    @GetMapping("/getAllBookings")
+    public ResponseEntity<List<BookingResponseDTO>> getAllBookings(Principal principal) {
+        try {
+            List<BookingResponseDTO> bookings = bookingService.getAllBooking(principal.getName());
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @PutMapping("/updateStatus/{id}")
+    public  ResponseEntity<?> updateStatus(@PathVariable Long id, Principal principal) {
+        try{
+            bookingService.confirmBooking(principal.getName(), id);
+            return ResponseEntity.ok("Booking confirmed successfully!");
+        }catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
         }
     }
 }
