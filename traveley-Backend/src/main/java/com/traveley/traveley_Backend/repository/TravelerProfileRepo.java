@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface TravelerProfileRepo extends JpaRepository<TravelerProfile, Long> {
    Optional<TravelerProfile> findByUser_Id(Long id);
-
+   Optional<TravelerProfile> findByUser_Username(String username);
 }
