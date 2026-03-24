@@ -2,6 +2,7 @@ package com.traveley.traveley_Backend.controller;
 
 import com.traveley.traveley_Backend.dto.BookingDTO;
 import com.traveley.traveley_Backend.dto.BookingResponseDTO;
+import com.traveley.traveley_Backend.dto.TopPackageDTO;
 import com.traveley.traveley_Backend.service.custom.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,5 +57,10 @@ public class BookingController {
         }catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
         }
+    }
+    @GetMapping("/getTopPackages")
+    public ResponseEntity<List<TopPackageDTO>> getTopPackages(){
+        List<TopPackageDTO> topPackages = bookingService.getTopPackages();
+        return ResponseEntity.ok(topPackages);
     }
 }
