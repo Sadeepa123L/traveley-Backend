@@ -30,7 +30,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String jwtToken;
         final String username;
 
-        // 1. Header එක එනවද කියලා බලමු
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -40,15 +39,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             username = jwtUtil.extractUsername(jwtToken);
-            System.out.println("Extracted Username: " + username); // Debug Log
+            System.out.println("Extracted Username: " + username);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // 2. මෙන්න මෙතන තමයි ගොඩක් වෙලාවට Fail වෙන්නේ
-                // validateToken එකට userDetails එකත් යවන්න ඕනෙද කියලා චෙක් කරන්න
                 if (jwtUtil.validateToken(jwtToken)) {
-                    System.out.println("Token is Valid for user: " + username); // Debug Log
+                    System.out.println("Token is Valid for user: " + username);
 
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
@@ -57,9 +54,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    System.out.println("Authentication set in SecurityContext for: " + username); // Debug Log
+                    System.out.println("Authentication set in SecurityContext for: " + username);
                 } else {
-                    System.out.println("Token Validation Failed!"); // Debug Log
+                    System.out.println("Token Validation Failed!");
                 }
             }
         } catch (Exception e) {
