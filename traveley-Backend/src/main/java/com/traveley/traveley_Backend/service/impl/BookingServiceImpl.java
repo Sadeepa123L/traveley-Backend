@@ -1,8 +1,6 @@
 package com.traveley.traveley_Backend.service.impl;
 
-import com.traveley.traveley_Backend.dto.BookingDTO;
-import com.traveley.traveley_Backend.dto.BookingDetailsDTO;
-import com.traveley.traveley_Backend.dto.BookingResponseDTO;
+import com.traveley.traveley_Backend.dto.*;
 import com.traveley.traveley_Backend.entity.*;
 import com.traveley.traveley_Backend.repository.AgencyProfileRepo;
 import com.traveley.traveley_Backend.repository.BookingRepo;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final AgencyProfileRepo agencyProfileRepo;
     private final ModelMapper modelMapper;
     private final BookingRepo bookingRepo;
+    private final EmailService emailService;
 
     @Override
     public void bookTourPackage(BookingDTO bookingDTO, String username, Long id) {
@@ -88,6 +88,8 @@ public class BookingServiceImpl implements BookingService {
                     response.setStatus(booking.getStatus());
                     response.setGuestCount(booking.getBookingDetails().getGuestCount());
                     response.setTotalPrice(booking.getTotalPrice());
+                    response.setEmail(booking.getBookingDetails().getEmail());
+                    response.setMobileNumber(booking.getBookingDetails().getContactNumber());
 
                     return response;
                 }).collect(Collectors.toList());
@@ -108,5 +110,46 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus("CONFIRMED");
         bookingRepo.save(booking);
+
+        sendConfirmationEmail(booking);
+    }
+
+    @Override
+    public List<TopPackageDTO> getTopPackages() {
+
+        List<Booking> allBookings = bookingRepo.findAll();
+
+        Map<TourPackage, Long> packageCounts = allBookings.stream()
+                .collect(Collectors.groupingBy(Booking::getTourPackage, Collectors.counting()));
+
+        return packageCounts.entrySet().stream()
+                .sorted((entry1, entry2) -> Long.compare(entry2.getValue(), entry1.getValue()))
+                .limit(3)
+                .map(entry -> {
+                    TourPackage tourPackage = entry.getKey();
+                    Long count = entry.getValue();
+
+                    return new TopPackageDTO(
+                            tourPackage.getId(),
+                            tourPackage.getTitle(),
+                            count,
+                            tourPackage.getImageUrl()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    private void sendConfirmationEmail(Booking booking) {
+        try {
+            String travelerEmail = booking.getBookingDetails().getEmail();
+            String travelerName = booking.getBookingDetails().getContactName();
+            String packageName = booking.getTourPackage().getTitle();
+            Long bookingId = booking.getId();
+
+            emailService.sendBookingConfirmation(travelerEmail, travelerName, packageName, bookingId);
+            System.out.println("Email sent successfully to: " + travelerEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send confirmation email: " + e.getMessage());
+        }
     }
 }
