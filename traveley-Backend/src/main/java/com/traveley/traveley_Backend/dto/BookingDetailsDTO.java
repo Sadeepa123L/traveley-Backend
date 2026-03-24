@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class BookingDetailsDTO {
     private String contactName;
     private String contactNumber;
+    private String email;
     private LocalDateTime bookingDate;
     private Integer guestCount;
     private String specialRequest;
