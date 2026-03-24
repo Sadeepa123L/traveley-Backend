@@ -17,4 +17,6 @@ public class BookingResponseDTO {
     private Integer guestCount;
     private Double totalPrice;
     private String status;
+    private String email;
+    private String mobileNumber;
 }
