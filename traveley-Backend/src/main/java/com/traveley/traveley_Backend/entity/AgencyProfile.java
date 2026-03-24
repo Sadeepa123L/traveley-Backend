@@ -2,10 +2,7 @@ package com.traveley.traveley_Backend.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -39,6 +36,7 @@ public class AgencyProfile {
     @OneToMany(mappedBy = "agencyProfile", cascade = CascadeType.ALL)
     private List<TourPackage> tourPackages;
 
+    @EqualsAndHashCode.Exclude
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
