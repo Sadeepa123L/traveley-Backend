@@ -2,6 +2,7 @@ package com.traveley.traveley_Backend.service.impl;
 
 import com.traveley.traveley_Backend.dto.BookingDTO;
 import com.traveley.traveley_Backend.dto.BookingDetailsDTO;
+import com.traveley.traveley_Backend.dto.BookingResponseDTO;
 import com.traveley.traveley_Backend.entity.*;
 import com.traveley.traveley_Backend.repository.AgencyProfileRepo;
 import com.traveley.traveley_Backend.repository.BookingRepo;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +67,46 @@ public class BookingServiceImpl implements BookingService {
                 .build();
 
         bookingDetails.setBooking(booking);
+        bookingRepo.save(booking);
+    }
+
+    @Override
+    public List<BookingResponseDTO> getAllBooking(String username) {
+        AgencyProfile agencyProfile = agencyProfileRepo.findByUser_Username(username)
+                .orElseThrow(() -> new RuntimeException("Agency not found"));
+
+        List<Booking> bookings = bookingRepo.findAllByAgencyProfile_Id(agencyProfile.getId());
+
+        return bookings.stream().map(booking -> {
+            BookingResponseDTO response = new BookingResponseDTO();
+            response.setId(booking.getId());
+
+                    response.setTourPackageName(booking.getTourPackage().getTitle());
+                    response.setTravelerName(booking.getBookingDetails().getContactName());
+                    response.setGuestCount(booking.getBookingDetails().getGuestCount());
+                    response.setTravelDate(String.valueOf(booking.getTravelDate()));
+                    response.setStatus(booking.getStatus());
+                    response.setGuestCount(booking.getBookingDetails().getGuestCount());
+                    response.setTotalPrice(booking.getTotalPrice());
+
+                    return response;
+                }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void confirmBooking(String username, Long id) {
+
+        AgencyProfile agencyProfile = agencyProfileRepo.findByUser_Username(username)
+                .orElseThrow(() -> new RuntimeException("Agency not found"));
+
+        Booking booking = bookingRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if(!booking.getAgencyProfile().getId().equals(agencyProfile.getId())){
+            throw new RuntimeException("You are not authorized to confirm this booking");
+        }
+
+        booking.setStatus("CONFIRMED");
         bookingRepo.save(booking);
     }
 }
