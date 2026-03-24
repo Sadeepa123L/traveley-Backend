@@ -24,6 +24,7 @@ public class BookingDetails {
 
     private String contactName;
     private String contactNumber;
+    private String email;
     private LocalDateTime bookingDate;
     private Integer guestCount;
     @Column(columnDefinition = "TEXT")
