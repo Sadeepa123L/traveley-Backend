@@ -2,6 +2,7 @@ package com.traveley.traveley_Backend.controller;
 
 import com.traveley.traveley_Backend.dto.BookingDTO;
 import com.traveley.traveley_Backend.dto.BookingResponseDTO;
+import com.traveley.traveley_Backend.dto.ChartDataDTO;
 import com.traveley.traveley_Backend.dto.TopPackageDTO;
 import com.traveley.traveley_Backend.service.custom.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,10 @@ public class BookingController {
     public ResponseEntity<List<TopPackageDTO>> getTopPackages(){
         List<TopPackageDTO> topPackages = bookingService.getTopPackages();
         return ResponseEntity.ok(topPackages);
+    }
+    @GetMapping("/getWeeklyRevenue")
+    public ResponseEntity<List<ChartDataDTO>> getWeeklyRevenue(){
+        List<ChartDataDTO> weeklyRevenue = bookingService.getWeeklyRevenueChart();
+        return ResponseEntity.ok(weeklyRevenue);
     }
 }
