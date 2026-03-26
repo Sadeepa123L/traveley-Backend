@@ -12,9 +12,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +141,29 @@ public class BookingServiceImpl implements BookingService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChartDataDTO> getWeeklyRevenueChart() {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+
+        List<Booking> weeklyBookings = bookingRepo.findByTravelDateBetween(startOfWeek, endOfWeek);
+
+        Map<DayOfWeek, ChartDataDTO> dailyStats = new LinkedHashMap<>();
+        for(DayOfWeek day : DayOfWeek.values()){
+            String dateName = day.getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+            dailyStats.put(day, new ChartDataDTO(dateName, 0, 0.0));
+        }
+        for(Booking booking : weeklyBookings){
+            DayOfWeek bookingDate = booking.getBookingDetails().getBookingDate().getDayOfWeek();
+            ChartDataDTO chartDataDTO = dailyStats.get(bookingDate);
+            chartDataDTO.setTotalBookings(chartDataDTO.getTotalBookings() + 1);
+
+            chartDataDTO.setRevenue(chartDataDTO.getRevenue() + booking.getTotalPrice());
+        }
+        return new ArrayList<>(dailyStats.values());
     }
 
     private void sendConfirmationEmail(Booking booking) {
