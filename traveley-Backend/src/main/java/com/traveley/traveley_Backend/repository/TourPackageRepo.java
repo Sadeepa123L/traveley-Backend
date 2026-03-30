@@ -17,4 +17,6 @@ public interface TourPackageRepo extends JpaRepository<TourPackage, Long> {
 
     @Query("SELECT t FROM TourPackage t WHERE t.agencyProfile.user.status = :status ORDER BY t.id DESC")
     List<TourPackage> findLatestPackages(@Param("status") String status, Pageable limit);
+
+    List<TourPackage> findByAgencyProfile_AgencyName(String agencyName);
 }

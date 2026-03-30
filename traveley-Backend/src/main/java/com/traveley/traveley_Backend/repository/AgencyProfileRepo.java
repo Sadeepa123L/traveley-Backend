@@ -12,4 +12,5 @@ public interface AgencyProfileRepo extends JpaRepository<AgencyProfile, Long> {
     List<AgencyProfile> findByUser_StatusAndUser_Role(String user_status, Role user_role);
     List<AgencyProfile> findByUser_StatusInAndUser_Role(List<String> statuses, Role user_role);
     Optional<AgencyProfile> findByUser_Username(String username);
+    Optional<AgencyProfile> findByAgencyName(String agencyName);
 }
