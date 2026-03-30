@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface BookingRepo extends JpaRepository<Booking, Long> {
     List<Booking> findAllByAgencyProfile_Id(Long id);
-    List<Booking> findByTravelDateBetween(LocalDate startDate, LocalDate endDate);
+    List<Booking> findByAgencyProfile_IdAndTravelDateBetween(Long id, LocalDate startDate, LocalDate endDate);
 }
