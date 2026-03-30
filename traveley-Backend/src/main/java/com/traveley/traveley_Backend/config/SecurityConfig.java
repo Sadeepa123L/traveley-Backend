@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/oauth2/**", "/api/chatbot/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/agency/approve/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
