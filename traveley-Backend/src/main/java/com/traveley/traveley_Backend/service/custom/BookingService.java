@@ -10,6 +10,7 @@ public interface BookingService {
     void bookTourPackage(BookingDTO bookingDTO, String username, Long id);
     List<BookingResponseDTO> getAllBooking(String username);
     void confirmBooking(String username, Long id);
-    List<TopPackageDTO> getTopPackages();
-    List<ChartDataDTO> getWeeklyRevenueChart();
+    List<TopPackageDTO> getTopPackages(String username);
+    List<ChartDataDTO> getWeeklyRevenueChart(String username);
+    List<BookingResponseDTO> getLatestBooking(String username);
 }

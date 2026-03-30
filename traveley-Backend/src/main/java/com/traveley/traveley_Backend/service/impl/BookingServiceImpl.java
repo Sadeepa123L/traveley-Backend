@@ -76,10 +76,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDTO> getAllBooking(String username) {
-        AgencyProfile agencyProfile = agencyProfileRepo.findByUser_Username(username)
-                .orElseThrow(() -> new RuntimeException("Agency not found"));
+     Optional<AgencyProfile> agencyProfile = agencyProfileRepo.findByUser_Username(username);
 
-        List<Booking> bookings = bookingRepo.findAllByAgencyProfile_Id(agencyProfile.getId());
+     if(agencyProfile.isEmpty()){
+         return new ArrayList<>();
+     }
+
+        List<Booking> bookings = bookingRepo.findAllByAgencyProfile_Id(agencyProfile.get().getId());
 
         return bookings.stream().map(booking -> {
             BookingResponseDTO response = new BookingResponseDTO();
@@ -119,9 +122,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<TopPackageDTO> getTopPackages() {
+    public List<TopPackageDTO> getTopPackages(String username) {
 
-        List<Booking> allBookings = bookingRepo.findAll();
+        Optional<AgencyProfile> agencyProfile = agencyProfileRepo.findByUser_Username(username);
+
+        if (agencyProfile.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Long agencyId = agencyProfile.get().getId();
+
+        List<Booking> allBookings = bookingRepo.findAllByAgencyProfile_Id(agencyId);
 
         Map<TourPackage, Long> packageCounts = allBookings.stream()
                 .collect(Collectors.groupingBy(Booking::getTourPackage, Collectors.counting()));
@@ -144,26 +155,81 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<ChartDataDTO> getWeeklyRevenueChart() {
+    public List<ChartDataDTO> getWeeklyRevenueChart(String username) {
+
+        Optional<AgencyProfile> agencyProfile = agencyProfileRepo.findByUser_Username(username);
+
+        if (agencyProfile.isEmpty()) {
+            List<ChartDataDTO> emptyChart = new ArrayList<>();
+            for(DayOfWeek day : DayOfWeek.values()){
+                String dateName = day.getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+                emptyChart.add(new ChartDataDTO(dateName, 0, 0.0));
+            }
+            return emptyChart;
+        }
+
+        Long agencyId = agencyProfile.get().getId();
+
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+        LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
-        List<Booking> weeklyBookings = bookingRepo.findByTravelDateBetween(startOfWeek, endOfWeek);
+        List<Booking> allBookings = bookingRepo.findAllByAgencyProfile_Id(agencyId);
 
         Map<DayOfWeek, ChartDataDTO> dailyStats = new LinkedHashMap<>();
         for(DayOfWeek day : DayOfWeek.values()){
             String dateName = day.getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
             dailyStats.put(day, new ChartDataDTO(dateName, 0, 0.0));
         }
-        for(Booking booking : weeklyBookings){
-            DayOfWeek bookingDate = booking.getBookingDetails().getBookingDate().getDayOfWeek();
-            ChartDataDTO chartDataDTO = dailyStats.get(bookingDate);
-            chartDataDTO.setTotalBookings(chartDataDTO.getTotalBookings() + 1);
+        for(Booking booking : allBookings){
+            LocalDate bookingDate = booking.getBookingDetails().getBookingDate().toLocalDate();
 
-            chartDataDTO.setRevenue(chartDataDTO.getRevenue() + booking.getTotalPrice());
+            if (!bookingDate.isBefore(startOfWeek) && !bookingDate.isAfter(endOfWeek)) {
+                DayOfWeek dayOfWeek = bookingDate.getDayOfWeek();
+                ChartDataDTO chartDataDTO = dailyStats.get(dayOfWeek);
+
+                chartDataDTO.setTotalBookings(chartDataDTO.getTotalBookings() + 1);
+                chartDataDTO.setRevenue(chartDataDTO.getRevenue() + booking.getTotalPrice());
+            }
         }
+
         return new ArrayList<>(dailyStats.values());
+    }
+
+    @Override
+    public List<BookingResponseDTO> getLatestBooking(String username) {
+
+        Optional<AgencyProfile> agencyProfiles = agencyProfileRepo.findByUser_Username(username);
+
+        if(agencyProfiles.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        Long agencyId = agencyProfiles.get().getId();
+
+        List<Booking> allBookings = bookingRepo.findAllByAgencyProfile_Id(agencyId);
+
+        return allBookings.stream()
+                .sorted(Comparator.comparing((Booking b) -> b.getBookingDetails().getBookingDate()).reversed())
+                .limit(5)
+                .map(booking -> {
+                    BookingResponseDTO dto = new BookingResponseDTO();
+
+                    dto.setId(booking.getId());
+                    dto.setTourPackageName(booking.getTourPackage().getTitle());
+                    String fullName = booking.getTravelerProfile().getFirstName() + " " + booking.getTravelerProfile().getLastName();
+
+                    dto.setTravelerName(fullName);
+                    dto.setTravelDate(booking.getBookingDetails().getBookingDate().toString());
+                    dto.setGuestCount(booking.getBookingDetails().getGuestCount());
+                    dto.setTotalPrice(booking.getTotalPrice());
+                    dto.setStatus(booking.getStatus());
+                    dto.setEmail(booking.getBookingDetails().getEmail());
+                    dto.setMobileNumber(booking.getTravelerProfile().getMobileNumber());
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     private void sendConfirmationEmail(Booking booking) {
