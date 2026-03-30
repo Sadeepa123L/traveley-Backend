@@ -60,13 +60,18 @@ public class BookingController {
         }
     }
     @GetMapping("/getTopPackages")
-    public ResponseEntity<List<TopPackageDTO>> getTopPackages(){
-        List<TopPackageDTO> topPackages = bookingService.getTopPackages();
+    public ResponseEntity<List<TopPackageDTO>> getTopPackages(Principal principal) {
+        List<TopPackageDTO> topPackages = bookingService.getTopPackages(principal.getName());
         return ResponseEntity.ok(topPackages);
     }
     @GetMapping("/getWeeklyRevenue")
-    public ResponseEntity<List<ChartDataDTO>> getWeeklyRevenue(){
-        List<ChartDataDTO> weeklyRevenue = bookingService.getWeeklyRevenueChart();
+    public ResponseEntity<List<ChartDataDTO>> getWeeklyRevenue(Principal principal){
+        List<ChartDataDTO> weeklyRevenue = bookingService.getWeeklyRevenueChart(principal.getName());
         return ResponseEntity.ok(weeklyRevenue);
+    }
+    @GetMapping("/getLatestBookings")
+    public ResponseEntity<List<BookingResponseDTO>> getLatestBookings(Principal principal){
+        List<BookingResponseDTO> getLatestBookings = bookingService.getLatestBooking(principal.getName());
+        return ResponseEntity.ok(getLatestBookings);
     }
 }
