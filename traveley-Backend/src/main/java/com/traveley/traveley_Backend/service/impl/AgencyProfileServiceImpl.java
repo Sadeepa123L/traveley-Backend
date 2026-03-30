@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -65,10 +66,13 @@ public class AgencyProfileServiceImpl implements AgencyProfileService {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        AgencyProfile agencyProfile = agencyProfileRepo.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Agency profile not found"));
+        Optional<AgencyProfile> agencyProfileOpt = agencyProfileRepo.findByUserId(user.getId());
 
-        return modelMapper.map(agencyProfile, AgencyProfileDTO.class);
+        if (agencyProfileOpt.isEmpty()) {
+            return new AgencyProfileDTO();
+        }
+
+        return modelMapper.map(agencyProfileOpt.get(), AgencyProfileDTO.class);
     }
 
     @Override
