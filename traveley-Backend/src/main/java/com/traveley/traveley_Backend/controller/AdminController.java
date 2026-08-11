@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin")
-public class AdminController {
+public class  AdminController {
 
     private final TravelerProfileService travelerProfileService;
     private final AgencyService agencyService;

@@ -7,6 +7,7 @@ import com.traveley.traveley_Backend.repository.TourPackageRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
+import org.stringtemplate.v4.ST;
 
 import java.util.List;
 
@@ -40,17 +41,12 @@ public class ChatbotToolService {
             "The input should be the exact agency name.")
     public String getTourPackagesByAgency(String agencyName){
 
-        AgencyProfile agencyProfile = agencyProfileRepo.findByAgencyName(agencyName)
-                .orElseThrow(() -> new RuntimeException("Agency not found: " + agencyName));
-
-        String agency = agencyProfile.getAgencyName();
-
-        List<TourPackage> tourPackages = tourPackageRepo.findByAgencyProfile_AgencyName(agency);
+        List<TourPackage> tourPackages = tourPackageRepo.findByAgencyProfile_AgencyName(agencyName);
 
         if (tourPackages.isEmpty()) {
-            return "Sorry, we couldn't find any packages from the agency: " + agency;
+            return "Sorry, we couldn't find any packages from the agency: " + agencyName;
         }
-        StringBuilder sb = new StringBuilder("Available Tour Packages from" + agency + "\n");
+        StringBuilder sb = new StringBuilder("Available Tour Packages from" + agencyName + "\n");
         for(TourPackage tp : tourPackages) {
             sb.append("Package Name: ").append(tp.getTitle()).append("\n")
                     .append("Description: ").append(tp.getDescription()).append("\n")
@@ -60,5 +56,8 @@ public class ChatbotToolService {
                     .append(" -----------------------------\n");
         }
         return sb.toString();
+    }
+    @Tool(description = "Generate a booking checkout link. ONLY use this AFTER you have explicitly asked for and received the traveler's name and mobile number. Do not guess or make up these details.")    public String generateBookingLink(String packageName, String travelerName, String contactNumber){
+        return "BOOKING_ACTION|" + packageName + "|" + travelerName + "|" + contactNumber;
     }
 }
