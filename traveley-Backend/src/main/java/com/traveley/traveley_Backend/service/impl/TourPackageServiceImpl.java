@@ -112,7 +112,7 @@ public class TourPackageServiceImpl implements TourPackageService {
             existingPackage.setImageUrl(imageUrl);
         }
 
-        //update krapu package eka save karala DTO ekak widiyata return karanwa
+
         TourPackage savedPackage = tourPackageRepo.save(existingPackage);
         return modelMapper.map(savedPackage, TourPackageDTO.class);
     }
