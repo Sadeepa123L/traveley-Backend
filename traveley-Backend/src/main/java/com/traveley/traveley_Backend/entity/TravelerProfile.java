@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Entity
